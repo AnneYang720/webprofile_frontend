@@ -1,6 +1,6 @@
 <template>
   <div class="regis-container">
-    <el-form :model="registerForm" :rules="registerRules" ref="registerForm" label-position="left" label-width="0px"
+    <el-form :model="signupForm" :rules="registerRules" ref="signupForm" label-position="left" label-width="0px"
       class="card-box login-form">
       <h3 class="title">MegEngine Web Profile 注册</h3>
 
@@ -8,14 +8,14 @@
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="email" type="text" v-model="registerForm.email" placeholder="email" />
+        <el-input name="email" type="text" v-model="signupForm.email" placeholder="email" />
       </el-form-item>
 
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password"></svg-icon>
         </span>
-        <el-input name="password" :type="pwdType" v-model="registerForm.password" 
+        <el-input name="password" :type="pwdType" v-model="signupForm.password" 
           placeholder="password"></el-input>
           <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
@@ -46,7 +46,7 @@ export default {
         }
     }
     return{
-      registerForm: {
+      signupForm: {
         email: '',
         password: ''
       },
@@ -72,9 +72,9 @@ export default {
       else {this.pwdType = 'password'}
     },
     handleRegister() {
-      this.$refs.registerForm.validate(valid => {
+      this.$refs.signupForm.validate(valid => {
         if(valid){
-          signup(this.registerForm).then(response =>{
+          signup(this.signupForm).then(response =>{
             this.$message({
               message: response.message,
               type: (response.flag ? 'success':'error')
