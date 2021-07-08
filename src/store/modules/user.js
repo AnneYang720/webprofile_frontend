@@ -5,7 +5,6 @@ const user = {
   state: {
     token: getToken(),
     email: '',
-    avatar: '',
     userId:'',
   },
 
@@ -15,9 +14,6 @@ const user = {
     },
     SET_EMAIL: (state, email) => {
       state.email = email
-    },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar
     },
     SET_USERID: (state, userId) => {
       state.userId = userId

@@ -74,6 +74,7 @@ export default {
     handleRegister() {
       this.$refs.signupForm.validate(valid => {
         if(valid){
+          this.signupForm.password = this.mdpassword
           signup(this.signupForm).then(response =>{
             this.$message({
               message: response.message,

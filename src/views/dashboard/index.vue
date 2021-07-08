@@ -1,7 +1,7 @@
 <template>
 <div class="dashboard-container">
-  <img src="/static/img/front.png" class="frontpic"/>
-  <div style="color:#AFEEEE;text-align:center;margin-top:1%">Made By XiaoyanYang</div> 
+  <img src="/static/img/logo.png" class="frontpic"/>
+  <div style="font-size:32px;color:#130B52;text-align:center;margin-top:1%">欢迎使用MegEngine Web Profile工具</div> 
 </div>
 </template>
 
@@ -17,15 +17,15 @@ export default {
     ])
   },
   data(){
-        return {
+      return {
       }
-    },
-    created () {
-    },
-    methods: {
-    },
-    watch: {
-    }
+  },
+  created () {
+  },
+  methods: {
+  },
+  watch: {
+  }
 }
 </script>
 

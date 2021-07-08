@@ -39,28 +39,28 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/project',
+    path: '/task',
     component: Layout,
-    name: 'Project',
-    meta: { title: '项目', icon: 'example' },
+    name: 'Task',
+    meta: { title: '任务', icon: 'example' },
     children: [
       {
-        path: 'mine',
-        name: 'mine',
-        component: () => import('@/views/table/project'),
-        meta: { title: '我的项目', icon: 'table', reuse: false }
+        path: 'create',
+        name: 'Create',
+        component: () => import('@/views/table/create'),
+        meta: { title: '新建任务', icon: 'table', reuse: false }
       },
       {
         path: 'all',
-        name: 'all',
+        name: 'All',
         component: () => import('@/views/table/projectcenter'),
-        meta: { title: '全部项目', icon: 'table', reuse: false  }
+        meta: { title: '任务列表', icon: 'table', reuse: false  }
       },
       {
-        path: 'search',
-        name: 'search',
+        path: 'result',
+        name: 'Result',
         component: () => import('@/views/table/projectsearch'),
-        meta: { title: '文件搜索', icon: 'table', reuse: false  }
+        meta: { title: '任务结果', icon: 'table', reuse: false  }
       }
     ]
   },
@@ -75,13 +75,13 @@ export const constantRouterMap = [
       {
         path: 'mine',
         name: 'mine',
-        component: () => import('@/views/table/refer'),
+        component: () => import('@/views/table/project'),
         meta: { title: '我的文献', icon: 'table', reuse: false  }
       },
       {
         path: 'all',
         name: 'all',
-        component: () => import('@/views/table/refercenter'),
+        component: () => import('@/views/table/project'),
         meta: { title: '全部文献', icon: 'table', reuse: false  }
       }
     ]

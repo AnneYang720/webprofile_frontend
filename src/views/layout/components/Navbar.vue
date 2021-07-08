@@ -4,9 +4,7 @@
     <breadcrumb></breadcrumb>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <!-- <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
-         -->
-        <v-gravatar class="user-avatar" alt="Avatar" default-img="identicon" />
+        <img class="user-avatar" src='/static/img/avatar.png' />
 
         <i class="el-icon-caret-bottom"></i>
       </div>
@@ -28,7 +26,7 @@
 
       <el-form label-width="20%" style="width:95%">
         <el-form-item label="姓名">
-          <el-input v-model="pojo.userName" :placeholder="userName"></el-input>
+          <el-input v-model="pojo.email" :placeholder="email"></el-input>
         </el-form-item>
         <el-form-item label="密码">
           <el-input v-model="pojo.password"></el-input>
@@ -66,9 +64,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'userName',
-      'sidebar',
-      'avatar'
+      'email',
+      'sidebar'
     ])
   },
   methods: {
