@@ -133,13 +133,13 @@ export default {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
-          }).then(() => {
+          }).then(async() => {
             if(this.beforeUpload()){
               let formData = new FormData();
-              let e = await pFileReader(this.uploadFileList[0].raw)
-              formData.append('mgeFile', new Buffer(e.target.result, 'binary'));
-              let e = await pFileReader(this.uploadDataList[0].raw)
-              formData.append('dataFile', new Buffer(e.target.result, 'binary'))
+              let e_mge = await pFileReader(this.uploadFileList[0].raw)
+              formData.append('mgeFile', new Buffer(e_mge.target.result, 'binary'));
+              let e_data = await pFileReader(this.uploadDataList[0].raw)
+              formData.append('dataFile', new Buffer(e_data.target.result, 'binary'))
               formData.append('platform', this.chosenPlatform)
               formData.append('version', this.chosenVersion)
               taskApi.createTask(formData).then(response =>{
