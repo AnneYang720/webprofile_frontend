@@ -53,13 +53,13 @@ export const constantRouterMap = [
       {
         path: 'all',
         name: 'All',
-        component: () => import('@/views/table/projectcenter'),
+        component: () => import('@/views/table/create'),
         meta: { title: '任务列表', icon: 'table', reuse: false  }
       },
       {
         path: 'result',
         name: 'Result',
-        component: () => import('@/views/table/projectsearch'),
+        component: () => import('@/views/table/create'),
         meta: { title: '任务结果', icon: 'table', reuse: false  }
       }
     ]
@@ -75,13 +75,13 @@ export const constantRouterMap = [
       {
         path: 'mine',
         name: 'mine',
-        component: () => import('@/views/table/project'),
+        component: () => import('@/views/table/create'),
         meta: { title: '我的文献', icon: 'table', reuse: false  }
       },
       {
         path: 'all',
         name: 'all',
-        component: () => import('@/views/table/project'),
+        component: () => import('@/views/table/create'),
         meta: { title: '全部文献', icon: 'table', reuse: false  }
       }
     ]

@@ -1,316 +1,105 @@
 <template>
   <div>
     <br>
-
       <div style="line-height:40px;margin-left:5%"> 新建项目</div>
-      <el-form :model="fileForm" :rules="uploadRules" ref="fileForm" label-width="100px" style="margin-left:5%">
+      <el-form label-width="100px" style="margin-left:5%">
+        
         <el-form-item label="mge模型">
           <el-upload
-            ref="uploadFile"
-            :action="uploadFileUrl"
+            ref="uploadMGE"
+            accept=".mge"
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
-            :file-list="uploadFileList"
-            :on-change="handleFileUploadChange">
+            :file-list="uploadMGEList"
+            :on-change="handleMGEUploadChange">
             <el-button type="primary" slot="trigger">选取文件</el-button>
           </el-upload>
         </el-form-item>
+
         <el-form-item label="数据">
           <el-upload
-            ref="uploadFile"
-            :action="uploadFileUrl"
+            ref="uploadData"
+            accept='.pkl'
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
-            :file-list="uploadFileList"
-            :on-change="handleFileUploadChange">
+            :file-list="uploadDataList"
+            :on-change="handleDataUploadChange">
             <el-button type="primary" slot="trigger">选取文件</el-button>
           </el-upload>
         </el-form-item>
+
+        <el-form-item label="平台">
+          <el-select v-model="chosenPlatform" @change="platformChange" >
+            <el-option v-for="item in pList" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="版本">
+          <el-select v-model="chosenVersion" >
+            <el-option v-for="item in vList" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+
       </el-form>
       
-      <el-button style="margin-left:5%" type="primary" @click="handleUpload(true)">创 建</el-button>
-
-
-
+      <el-button style="margin-left:5%" type="primary" @click="handleUpload()">创 建</el-button>
 
   </div>
 </template>
 <script>
 
-import projectApi from '@/api/project'
+import taskApi from '@/api/task'
 import axios from 'axios'
 import {pFileReader} from '@/utils/filereader'
 
 export default {
     data(){
         return {
-          list: [], //首页用包名得到的列表
-          total:  0, //总条数
-          currentPage: 1, //当前页数
-          pageSize: 10, //每页条数
-          currentFileName: '', //当前选中行的文件名
-          currentUrl: '', //当前文件的下载地址和上传时间
-          currentKeywords: '', //当前文件的关键词
-          createDialogVisible: false, //新建项目的弹出框
-          uploadDialogVisible: false, //上传新文件的弹出框
-          detailVisible: false, //点开某行展示文件内容的弹出框
-          updateDialogVisible: false, //更新系列文件的弹出框
-          uploadFileUrl: '',
-          currentUploadDate: '',
-          saveFlag: true, //文件通过url直接上传是否成功
-          projectName: '', //上传文件时选中的项目名称
-          expandProjectId: '', //当前展开的项目编号
-          uploadFileList: [], //用户上传的文件列表
-          chosenVersion: '', //当前选中的版本号
-          vList: [], //记录某一行的versionList
-          createForm: {
-            projectName: ''
-          },
-          fileForm: {
-            id:'',
-            fileName: '',
-            keywords: [],
-            projectId:''
-          },
-          createRules: {
-            projectName: [{ required: true, message: '请输入项目名称', trigger: 'blur'}]
-          },
-          uploadRules: {
-            fileName: [{ required: true, message: '请输入文件名称', trigger: 'blur'}],
-            keywords: [{ type: 'array', max: 5, message: '最多添加5个关键词' }]
-          },
-          updateRules: {
-            keywords: [{ type: 'array', max: 5, message: '最多添加5个关键词' }]
-          },
-          fileList: [],
-          expands: [],
-          getRowKey(row) { return row.id },
-          inputVisible: false,
-          inputValue: ''
+          uploadMGEList: [],
+          uploadDataList: [],
+          chosenPlatform: '',
+          chosenVersion: '',
+          pList: [], //该用户可选的平台架构list
+          vList: [], //选中架构后，该用户可选的MegEngine版本list
         }
     },
     created () {
-        this.fetchData()
+        this.fetchPlatformList()
     },
     methods: {
-        fetchData(){
-            projectApi.getProjectList(this.$router.currentRoute.name,this.currentPage,this.pageSize).then(response =>{
-                this.total = response.data.total
-                this.list = response.data.rows
-            }).catch(() => {
-                this.total = 0
-                this.list = []
+        // 获取该用户可用的平台
+        fetchPlatformList(){
+          taskApi.getPlatformList().then(response =>{
+            this.total = response.data.total
+            this.list = response.data.rows
+          }).catch(() => {
+            this.$message({
+              message: response.message,
+              type: (response.flag ? 'success':'error')
+            })
           });
         },
-
-        handleSizeChange(val) {
-          this.pageSize = val;
-          this.fetchData();
-        },
-
-        handleCurrentChange(val) {
-          this.currentPage = val;
-          this.fetchData();
-        },
-
         
-        handleCreate(){
-          this.$refs.createForm.validate(valid => {
-            if(valid){
-              projectApi.createProject(this.createForm).then(response =>{
-                this.$message({
-                  message: response.message,
-                  type: (response.flag ? 'success':'error')
-                });
-                if(response.flag){//如果成功
-                  this.fetchData()
-                }
-              })
-              this.closeCreate()
-            }else{
-              this.$message.error('项目名称不能为空')
-            }
-          })
-        },
-
-        // 限制文件上传的个数只有一个，获取上传列表的最后一个
-        handleFileUploadChange(file, uploadFileList) {
-            if (uploadFileList.length > 0) {
-                this.uploadFileList = [uploadFileList[uploadFileList.length - 1]] // 这一步，是 展示最后一次选择的文件
+        // 限制MGE模型上传的个数只有一个，获取上传列表的最后一个
+        handleMGEUploadChange(file, uploadMGEList) {
+            if (uploadMGEList.length > 0) {
+                this.uploadMGEList = [uploadMGEList[uploadMGEList.length - 1]] // 展示最后一次选择的文件
             }
         },
 
-        handleUpload(flag) {
-            if(flag){
-                if(this.uploadFileList.length==0){
-                    this.$message.error('文件必须上传')
-                    return false
-                }
-                this.fileForm.fileName += this.uploadFileList[0].name.substring(this.uploadFileList[0].name.lastIndexOf('.'))
-                this.$refs.fileForm.validate(valid => {
-                    if(valid){
-                        this.handleCreateURL()
-                    }else {
-                        console.log('error submit!!')
-                        this.$message.error('信息格式错误')
-                        return false
-                    }
-
-                })
-                this.closeUpload() // 关闭窗口
-            }else{
-                this.fileForm.fileName = this.currentFileName
-                this.fileForm.projectId = this.expandProjectId
-                this.$refs.fileForm.validate(valid => {
-                    if(valid){
-                        if(this.uploadFileList.length>0){
-                            this.handleCreateURL()
-                        }
-                        if(this.fileForm.keywords!=this.currentKeywords){
-                            projectApi.updateFile(this.fileForm).then(response =>{
-                                this.$message({
-                                message: response.message,
-                                type: (response.flag ? 'success':'error')
-                                });
-                                if(response.flag){//如果成功
-                                this.fetchData()
-                                this.expands = []
-                                }
-                            })
-                        }
-                    }else{
-                        console.log('error submit!!')
-                        this.$message.error('信息格式错误')
-                        return false
-                    }
-                })
-                this.closeUpdate() // 关闭窗口
+        // 限制数据文件上传的个数只有一个，获取上传列表的最后一个
+        handleDataUploadChange(file, uploadDataList) {
+            if (uploadDataList.length > 0) {
+                this.uploadDataList = [uploadDataList[uploadDataList.length - 1]] // 展示最后一次选择的文件
             }
         },
 
-
-        handleCreateURL(){
-            projectApi.createURL(this.fileForm).then(async(response) => {
-                if(response.flag){
-                  this.uploadFileUrl = response.data.uploadFileUrl
-                  this.fileForm.id = response.data.fileId
-
-                  let e = await pFileReader(this.uploadFileList[0].raw)
-                  let res = await axios.put(this.uploadFileUrl, new Buffer(e.target.result, 'binary'))
-                  //console.log(res)
-                  if(res.status!=200){
-                    this.saveFlag = false
-                    this.$message.error('文件上传失败')
-                    throw new Error('文件上传失败！')
-                  }
-                  
-                  if(this.saveFlag){
-                    //console.log('save')
-                    projectApi.saveFile(this.fileForm).then(response =>{
-                      this.$message({
-                        message: response.message,
-                        type: (response.flag ? 'success':'error')
-                      });
-                      if(response.flag){
-                          this.fetchData()
-                        }
-                      })
-                  }else{
-                    this.$message.error('文件上传失败')
-                    return false
-                  }
-                  
-                }else {
-                  console.log('创建上传URL失败!!')
-                  return false
-                }
-              })
-        },
-
-        downFile () {
-          //console.log(downloadurl)
-          var ele = document.createElement('a')
-          ele.download = this.currentFileName
-          ele.style.display = 'none';
-          ele.href = this.currentUrl
-          ele.target="_blank"; // 针对 ie模式 的浏览器
-          // 触发点击
-          document.body.appendChild(ele);
-          ele.click();
-          // 然后移除
-          document.body.removeChild(ele);
-        },
-
-        delProject(row){
-            this.$confirm('您确定要删除此项目吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            projectApi.deleteProject(row.id).then(response =>{
-              this.$message({
-                message: response.message,
-                type: (response.flag ? 'success':'error')
-              });
-              if(response.flag){
-                this.fetchData()
-              }
-            })
-          }).catch(() => {
-          });
-        },
-
-        delFiles(row){
-          this.$confirm('您确定要删除此系列文件吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            //console.log("delete this group")
-            projectApi.deleteFiles(this.expandProjectId,row.fileName).then(response =>{
-              this.$message({
-                message: response.message,
-                type: (response.flag ? 'success':'error')
-              });
-              if(response.flag){
-                this.fetchData()
-                this.expands = []
-              }
-            })
-          }).catch(() => {
-          });
-        },
-
-        delVersion(){
-          this.$confirm('您确定要删除此版本吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            //console.log("delete this version")
-            projectApi.deleteVersion(this.expandProjectId,this.currentFileName,this.chosenVersion).then(response =>{
-              this.$message({
-                message: response.message,
-                type: (response.flag ? 'success':'error')
-              });
-              if(response.flag){
-                this.expands = []
-                this.fetchData()
-              }
-            })
-          }).catch(() => {
-          });
-          this.detailVisible = false
-        },
-
-        //更改版本后获得新的url
-        urlChange(){
-          projectApi.getUrl(this.expandProjectId,this.currentFileName,this.chosenVersion).then(response =>{
-            this.currentUrl = response.data.downloadUrl
-            let dt = new Date(response.data.updateDate)
-            this.currentUploadDate = dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
+        //更改平台架构后获得新的MegEngine版本
+        platformChange(){
+          taskApi.getVList(this.chosenPlatform).then(response =>{
+            this.vList = response.data
           }).catch(() => {
             this.$message({
               message: response.message,
@@ -319,27 +108,59 @@ export default {
           })
         },
 
-        formatDate(row, column) {
-          let data = row[column.property]
-          let dt = new Date(data)
-          return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
+        beforeUpload(){
+          if(this.uploadMGEList.length==0){
+            this.$message.error('MGE模型文件必须上传')
+            return false
+          }
+          if(this.uploadDataList.length==0){
+            this.$message.error('数据文件必须上传')
+            return false
+          }
+          if(this.chosenPlatform==''){
+            this.$message.error('请选择平台架构')
+            return false
+          }
+          if(this.chosenVersion==''){
+            this.$message.error('请选择MegEngine版本')
+            return false
+          }
+          return true
         },
 
-        formatKeywords(row, column){
-          return row[column.property].join(', ');
+        handleUpload(){
+          this.$confirm('确认创建该任务', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            if(this.beforeUpload()){
+              let formData = new FormData();
+              let e = await pFileReader(this.uploadFileList[0].raw)
+              formData.append('mgeFile', new Buffer(e.target.result, 'binary'));
+              let e = await pFileReader(this.uploadDataList[0].raw)
+              formData.append('dataFile', new Buffer(e.target.result, 'binary'))
+              formData.append('platform', this.chosenPlatform)
+              formData.append('version', this.chosenVersion)
+              taskApi.createTask(formData).then(response =>{
+                  this.$message({
+                    message: response.message,
+                    type: (response.flag ? 'success':'error')
+                  });
+                  if(response.flag){//如果成功
+                    this.uploadMGEList = []
+                    this.uploadDataList= []
+                    this.chosenPlatform= ''
+                    this.chosenVersion= ''
+                    this.vList = []
+                  }
+              })
+            }
+          })
         },
 
-        //监听row-click事件，实现选中
-        rowClick(row, column, event) {
-          this.detailVisible = true
-          this.currentFileName = row.fileName
-          this.currentKeywords = row.keywords
-          this.vList = row.versionList
-          this.vList.reverse()
-          this.chosenVersion = row.latestVersion
-          this.urlChange()
-        },
 
+        
 
         closeCreate() {
           this.createDialogVisible = false
@@ -370,41 +191,8 @@ export default {
           this.updateDialogVisible = false
         },
 
-        openUpdate(row) {
-          this.detailVisible = false
-          this.updateDialogVisible = true
-          this.currentFileName = row.fileName
-          this.currentKeywords = row.keywords
-          console.log("keywords "+this.currentKeywords)
-          this.$nextTick(()=>{
-            this.$refs['fileForm'].resetFields()
-          })
-          this.fileForm.keywords = (row.keywords.length == 1 && row.keywords[0] == "") ? [] : row.keywords
-          this.uploadFileList = []
-        },
-
-        expandSelect(row, expandedRows){
-          this.expands = []
-          if (expandedRows.length>0) {
-            projectApi.getFileList(row.id).then(response =>{
-                this.fileList = response.data
-                this.expandProjectId = row.id
-                console.log(row.projectName)
-                row ? this.expands.push(row.id):'' 
-            }).catch(() => {
-                this.total = 0
-                this.fileList = []
-            })           
-          }
-        },
-
         handleClose(tag) {this.fileForm.keywords.splice(this.fileForm.keywords.indexOf(tag), 1);},
-        showInput() {
-          this.inputVisible = true;
-          this.$nextTick(_ => {
-            this.$refs.saveTagInput.$refs.input.focus();
-          });
-        },
+                
         handleInputConfirm() {
           let inputValue = this.inputValue;
           if (inputValue) {
@@ -413,6 +201,11 @@ export default {
           this.inputVisible = false;
           this.inputValue = '';
         },
+
+
+        
+
+        
 
     },
     watch: {
