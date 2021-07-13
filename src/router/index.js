@@ -47,19 +47,19 @@ export const constantRouterMap = [
       {
         path: 'create',
         name: 'Create',
-        component: () => import('@/views/table/create'),
+        component: () => import('@/views/task/create'),
         meta: { title: '新建任务', icon: 'table', reuse: false }
       },
       {
         path: 'list',
         name: 'List',
-        component: () => import('@/views/table/tasks'),
+        component: () => import('@/views/task/list'),
         meta: { title: '任务列表', icon: 'table', reuse: false  }
       },
       {
         path: 'result',
         name: 'Result',
-        component: () => import('@/views/table/result'),
+        component: () => import('@/views/task/result'),
         meta: { title: '任务结果', icon: 'table', reuse: false  }
       }
     ]
