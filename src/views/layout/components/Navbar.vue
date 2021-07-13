@@ -25,7 +25,7 @@
       >
 
       <el-form label-width="20%" style="width:95%">
-        <el-form-item label="姓名">
+        <el-form-item label="邮箱">
           <el-input v-model="pojo.email" :placeholder="email"></el-input>
         </el-form-item>
         <el-form-item label="密码">
@@ -52,12 +52,17 @@ import {updateInfo} from '@/api/login'
 
 export default {
   data(){
-        return {
-            list:[],
-            dialogVisible: false, //编辑窗口是否可见
-            pojo:{},//编辑实体
-        }
-    },
+    return {
+      list:[],
+      dialogVisible: false, //编辑窗口是否可见
+      pojo:{},//编辑实体
+    }
+  },
+  computed: {
+    mdpassword: function () {
+      return coreJS.encryptedPassword(this.pojo.password)
+    }
+  },
   components: {
     Breadcrumb,
     Hamburger
@@ -78,6 +83,7 @@ export default {
       })
     },
     infoSave(){
+      this.pojo.password = this.mdpassword
       updateInfo(this.pojo).then(response =>{
         this.$message({
           message: response.message,

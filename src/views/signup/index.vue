@@ -1,6 +1,6 @@
 <template>
   <div class="regis-container">
-    <el-form :model="signupForm" :rules="registerRules" ref="signupForm" label-position="left" label-width="0px"
+    <el-form :model="signupForm" :rules="signupRules" ref="signupForm" label-position="left" label-width="0px"
       class="card-box login-form">
       <h3 class="title">MegEngine Web Profile 注册</h3>
 
@@ -50,7 +50,7 @@ export default {
         email: '',
         password: ''
       },
-      registerRules: {
+      signupRules: {
         email: [
           { required: true, message: '请输入邮箱地址', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     mdpassword: function () {
-      return coreJS.encryptedPassword(this.formInline.password)
+      return coreJS.encryptedPassword(this.signupForm.password)
     }
   },
   methods: {

@@ -22,4 +22,17 @@ export default{
         })
     },
     
+    getTasksList(page,size){
+        return request({
+            url: `/task/getlist/${page}/${size}`,//ES6写法
+            method: 'get'
+        });
+    },
+
+    getTaskInfo(taskId){
+        return request({
+            url: `/task/getinfo/${taskId}`,//ES6写法
+            method: 'get'
+        });
+    },
 } 

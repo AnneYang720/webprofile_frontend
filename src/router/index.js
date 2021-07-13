@@ -51,38 +51,16 @@ export const constantRouterMap = [
         meta: { title: '新建任务', icon: 'table', reuse: false }
       },
       {
-        path: 'all',
-        name: 'All',
-        component: () => import('@/views/table/create'),
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/table/tasks'),
         meta: { title: '任务列表', icon: 'table', reuse: false  }
       },
       {
         path: 'result',
         name: 'Result',
-        component: () => import('@/views/table/create'),
+        component: () => import('@/views/table/result'),
         meta: { title: '任务结果', icon: 'table', reuse: false  }
-      }
-    ]
-  },
-
-  {
-    path: '/reference',
-    component: Layout,
-    //redirect: '/maven/release',
-    name: 'Reference',
-    meta: { title: '文献', icon: 'example' },
-    children: [
-      {
-        path: 'mine',
-        name: 'mine',
-        component: () => import('@/views/table/create'),
-        meta: { title: '我的文献', icon: 'table', reuse: false  }
-      },
-      {
-        path: 'all',
-        name: 'all',
-        component: () => import('@/views/table/create'),
-        meta: { title: '全部文献', icon: 'table', reuse: false  }
       }
     ]
   },

@@ -56,7 +56,7 @@ export default {
   },
 	computed: {
 		mdpassword: function () {
-			return coreJS.encryptedPassword(this.formInline.password)
+			return coreJS.encryptedPassword(this.loginForm.password)
 		}
 	},
   methods: {

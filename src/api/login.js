@@ -21,14 +21,14 @@ export function signup(pojo){
 
 export function getInfo() {
   return request({
-    url: '/api/user/info',
+    url: '/user/info',
     method: 'get'
   })
 }
 
 export function updateInfo(pojo){
   return request({
-      url: '/api/user/saveinfo',
+      url: '/user/saveinfo',
       method: 'put',
       data: pojo
   })

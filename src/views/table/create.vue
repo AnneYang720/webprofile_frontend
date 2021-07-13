@@ -8,6 +8,7 @@
           <el-upload
             ref="uploadMGE"
             accept=".mge"
+            action="#"
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
@@ -20,7 +21,8 @@
         <el-form-item label="数据">
           <el-upload
             ref="uploadData"
-            accept='.pkl'
+            accept='.pickle'
+            action="#"
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
@@ -51,7 +53,6 @@
 <script>
 
 import taskApi from '@/api/task'
-import axios from 'axios'
 import {pFileReader} from '@/utils/filereader'
 
 export default {
@@ -72,8 +73,7 @@ export default {
         // 获取该用户可用的平台
         fetchPlatformList(){
           taskApi.getPlatformList().then(response =>{
-            this.total = response.data.total
-            this.list = response.data.rows
+            this.pList = response.data
           }).catch(() => {
             this.$message({
               message: response.message,
@@ -136,7 +136,7 @@ export default {
           }).then(async() => {
             if(this.beforeUpload()){
               let formData = new FormData();
-              let e_mge = await pFileReader(this.uploadFileList[0].raw)
+              let e_mge = await pFileReader(this.uploadMGEList[0].raw)
               formData.append('mgeFile', new Buffer(e_mge.target.result, 'binary'));
               let e_data = await pFileReader(this.uploadDataList[0].raw)
               formData.append('dataFile', new Buffer(e_data.target.result, 'binary'))
@@ -158,58 +158,9 @@ export default {
             }
           })
         },
-
-
-        
-
-        closeCreate() {
-          this.createDialogVisible = false
-        },
-
-        openCreate() {
-          this.createDialogVisible = true
-          this.$nextTick(()=>{
-            this.$refs['createForm'].resetFields()
-          })
-        },
-
-        closeUpload() {
-          this.uploadDialogVisible = false
-        },
-
-        openUpload(row) {
-          this.uploadDialogVisible = true
-          this.projectName = row.projectName
-          this.$nextTick(()=>{
-            this.$refs['fileForm'].resetFields()
-          })
-          this.fileForm.projectId = row.id
-          this.uploadFileList = []
-        },
-
-        closeUpdate() {
-          this.updateDialogVisible = false
-        },
-
-        handleClose(tag) {this.fileForm.keywords.splice(this.fileForm.keywords.indexOf(tag), 1);},
-                
-        handleInputConfirm() {
-          let inputValue = this.inputValue;
-          if (inputValue) {
-            this.fileForm.keywords.push(inputValue);
-          }
-          this.inputVisible = false;
-          this.inputValue = '';
-        },
-
-
-        
-
-        
-
     },
     watch: {
-      '$route': 'fetchData'
+      '$route': 'fetchPlatformList'
     },
 }
       
