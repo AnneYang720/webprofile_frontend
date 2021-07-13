@@ -134,12 +134,14 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(async() => {
+            console.log(this.uploadMGEList[0])
+            console.log(this.uploadMGEList[0].raw)
             if(this.beforeUpload()){
               let formData = new FormData();
-              let e_mge = await pFileReader(this.uploadMGEList[0].raw)
-              formData.append('mgeFile', new Buffer(e_mge.target.result, 'binary'));
-              let e_data = await pFileReader(this.uploadDataList[0].raw)
-              formData.append('dataFile', new Buffer(e_data.target.result, 'binary'))
+              // let e_mge = await pFileReader(this.uploadMGEList[0].raw)
+              formData.append('mgeFile', this.uploadMGEList[0].raw);
+              // let e_data = await pFileReader(this.uploadDataList[0].raw)
+              formData.append('dataFile', this.uploadDataList[0].raw)
               formData.append('platform', this.chosenPlatform)
               formData.append('version', this.chosenVersion)
               taskApi.createTask(formData).then(response =>{
