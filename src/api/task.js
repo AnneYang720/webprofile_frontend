@@ -14,11 +14,19 @@ export default{
         });
     },
     
-    createTask(pojo){
+    createTaskUrl(pojo){
         return request({
-            url: `/task/create`,
+            url: `/task/createurl`,
             method: 'post',
             data: pojo
+        })
+    },
+
+    saveTaskInfo(pojo){
+        return request({
+            url: `/task/savetaskinfo`,
+            method: 'post',
+            data: pojo       
         })
     },
     

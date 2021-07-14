@@ -8,7 +8,7 @@
           <el-upload
             ref="uploadMGE"
             accept=".mge"
-            action="#"
+            :action="uploadMgeUrl"
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
@@ -22,7 +22,7 @@
           <el-upload
             ref="uploadData"
             accept='.pickle'
-            action="#"
+            :action="uploadDataUrl"
             :multiple="false"
             :auto-upload="false"
             :show-file-list="true"
@@ -64,6 +64,10 @@ export default {
           chosenVersion: '',
           pList: [], //该用户可选的平台架构list
           vList: [], //选中架构后，该用户可选的MegEngine版本list
+          uploadMgeUrl: '',
+          uploadDataUrl: '',
+          newTaskId: '',
+          saveFlag:true, //两个文件通过url直接上传是否成功
         }
     },
     created () {
@@ -128,38 +132,71 @@ export default {
           return true
         },
 
+        // Final
         handleUpload(){
           this.$confirm('确认创建该任务', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(async() => {
-            console.log(this.uploadMGEList[0])
-            console.log(this.uploadMGEList[0].raw)
+            // TODO: Decide file is this.uploadMGEList[0] or this.uploadMGEList[0].raw
             if(this.beforeUpload()){
               let formData = new FormData();
-              // let e_mge = await pFileReader(this.uploadMGEList[0].raw)
-              formData.append('mgeFile', this.uploadMGEList[0].raw);
-              // let e_data = await pFileReader(this.uploadDataList[0].raw)
-              formData.append('dataFile', this.uploadDataList[0].raw)
               formData.append('platform', this.chosenPlatform)
               formData.append('version', this.chosenVersion)
-              taskApi.createTask(formData).then(response =>{
-                  this.$message({
-                    message: response.message,
-                    type: (response.flag ? 'success':'error')
-                  });
+              taskApi.createTaskUrl(formData).then(async(response) => {
                   if(response.flag){//如果成功
-                    this.uploadMGEList = []
-                    this.uploadDataList= []
-                    this.chosenPlatform= ''
-                    this.chosenVersion= ''
-                    this.vList = []
+                    this.uploadMgeUrl = response.data.mgeUrl
+                    this.uploadDataUrl = response.data.dataUrl
+                    this.newTaskId = response.data.taskId
+
+                    let e_mge = await pFileReader(this.uploadMGEList[0].raw)
+                    let res = await axios.put(this.uploadMgeUrl, new Buffer(e_mge.target.result, 'binary'))
+                    console.log(res)
+                    if(res.status!=200){
+                      this.saveFlag = false
+                    }
+
+                    let e_data = await pFileReader(this.uploadDataList[0].raw)
+                    let res = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
+                    console.log(res)
+                    if(res.status!=200){
+                      this.saveFlag = false
+                    }
+
+                    let formData = new FormData();
+                    formData.append('taskId', this.newTaskId)
+                    formData.append('saveFlag', this.saveFlag)
+                    taskApi.saveTaskInfo(formData).then(response =>{
+                      if(response.flag){
+                        if(this.saveFlag){
+                          this.$message.success('新任务创建成功')
+                          this.closeUpload() // 清空前端用户上传数据
+                        }else{
+                          this.$message.error('文件上传失败')
+                        }
+                      }else{
+                        this.$message.error('新任务创建失败')
+                      }
+                    })
+
+                  }else{
+                    this.$message.error('创建上传URL失败!!')
+                    return false
                   }
               })
             }
           })
         },
+
+        closeUpload(){
+          this.uploadMGEList = []
+          this.uploadDataList= []
+          this.chosenPlatform= ''
+          this.chosenVersion= ''
+          this.vList = []
+        },
+
     },
     watch: {
       '$route': 'fetchPlatformList'
