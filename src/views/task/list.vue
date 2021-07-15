@@ -42,7 +42,7 @@
 
       <el-table-column
         prop="time"
-        label="创建时间"
+        label="更新时间"
         :formatter="formatDate"
         min-width="20%">
       </el-table-column>
