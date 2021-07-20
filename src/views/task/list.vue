@@ -8,22 +8,22 @@
       style="width:80%;margin-left:10%;margin-top:2%">
 
       <el-table-column
-        prop="id"
+        prop="_id"
         label="任务ID"
         min-width="30%">
         <template slot-scope="scope">
-          <span style="color: DodgerBlue">{{ scope.row.id }}</span>
+          <span style="color: DodgerBlue">{{ scope.row._id }}</span>
         </template>
       </el-table-column>
 
       <el-table-column
-        prop="mge"
+        prop="mge_name"
         label="MGE模型"
         min-width="25%">
       </el-table-column>
 
       <el-table-column
-        prop="data"
+        prop="data_name"
         label="数据DATA"
         min-width="25%">
       </el-table-column>
@@ -85,11 +85,15 @@ export default {
     },
     methods: {
         fetchTasksList(){
+            // console.log("fetch"+this.currentPage+' '+this.pageSize);
             taskApi.getTasksList(this.currentPage,this.pageSize).then(response =>{
-                this.total = response.data.total
-                this.tasksList = response.data.rows
-            }).catch(() => {
+                this.total = response.data.total;
+                // console.log("success "+this.total);
+                this.tasksList = response.data.rows;
+            }).catch((err) => {
+                // console.log(err)
                 this.total = 0
+                // console.log("fail "+this.total)
                 this.tasksList = []
           });
         },
