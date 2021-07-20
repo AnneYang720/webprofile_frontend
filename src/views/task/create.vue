@@ -150,47 +150,47 @@ export default {
               formData.append('version', this.chosenVersion)
               formData.append('mge_name',this.uploadMGEList[0].name)
               formData.append('data_name',this.uploadDataList[0].name)
-            //   taskApi.createTaskUrl(formData).then(async(response) => {
-            //       if(response.flag){//如果成功
-            //         this.uploadMgeUrl = response.data.mgeUrl
-            //         this.uploadDataUrl = response.data.dataUrl
-            //         this.newTaskId = response.data.taskId
+              taskApi.createTaskUrl(formData).then(async(response) => {
+                  if(response.flag){//如果成功
+                    this.uploadMgeUrl = response.data.mgeUrl
+                    this.uploadDataUrl = response.data.dataUrl
+                    this.newTaskId = response.data.taskId
 
-            //         let e_mge = await pFileReader(this.uploadMGEList[0].raw)
-            //         let res_mge = await axios.put(this.uploadMgeUrl, new Buffer(e_mge.target.result, 'binary'))
-            //         console.log(res_mge)
-            //         if(res_mge.status!=200){
-            //           this.saveFlag = false
-            //         }
+                    let e_mge = await pFileReader(this.uploadMGEList[0].raw)
+                    let res_mge = await axios.put(this.uploadMgeUrl, new Buffer(e_mge.target.result, 'binary'))
+                    console.log(res_mge)
+                    if(res_mge.status!=200){
+                      this.saveFlag = false
+                    }
 
-            //         let e_data = await pFileReader(this.uploadDataList[0].raw)
-            //         let res_data = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
-            //         console.log(res_data)
-            //         if(res_data.status!=200){
-            //           this.saveFlag = false
-            //         }
+                    let e_data = await pFileReader(this.uploadDataList[0].raw)
+                    let res_data = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
+                    console.log(res_data)
+                    if(res_data.status!=200){
+                      this.saveFlag = false
+                    }
 
-            //         let formData = new FormData();
-            //         formData.append('taskId', this.newTaskId)
-            //         formData.append('saveFlag', this.saveFlag)
-            //         taskApi.saveTaskInfo(formData).then(response =>{
-            //           if(response.flag){
-            //             if(this.saveFlag){
-            //               this.$message.success('新任务创建成功')
-            //               this.closeUpload() // 清空前端用户上传数据
-            //             }else{
-            //               this.$message.error('文件上传失败')
-            //             }
-            //           }else{
-            //             this.$message.error('新任务创建失败')
-            //           }
-            //         })
+                    let formData = new FormData();
+                    formData.append('taskId', this.newTaskId)
+                    formData.append('saveFlag', this.saveFlag)
+                    taskApi.saveTaskInfo(formData).then(response =>{
+                      if(response.flag){
+                        if(this.saveFlag){
+                          this.$message.success('新任务创建成功')
+                          this.closeUpload() // 清空前端用户上传数据
+                        }else{
+                          this.$message.error('文件上传失败')
+                        }
+                      }else{
+                        this.$message.error('新任务创建失败')
+                      }
+                    })
 
-            //       }else{
-            //         this.$message.error('创建上传URL失败!!')
-            //         return false
-            //       }
-            //   })
+                  }else{
+                    this.$message.error('创建上传URL失败!!')
+                    return false
+                  }
+              })
             }
           })
         },
