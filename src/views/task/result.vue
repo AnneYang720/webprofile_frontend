@@ -2,12 +2,7 @@
   <div>
     <br>
     
-    <el-form :inline="true" style="margin-left:5%;margin-top:2%">
-      <el-form-item label="任务ID">
-        <el-input v-model="taskId"></el-input>
-      </el-form-item>
-      <el-button @click="handleShow()" type="primary" plain>查看</el-button>
-    </el-form>
+    <el-button @click="openDialog" type="primary" style="margin-left:5%;margin-top:2%" plain>查看结果</el-button>
 
     <el-table
       :data="tasksInfoList"
@@ -15,12 +10,84 @@
       :header-cell-style="{'text-align':'center'}"
       :cell-style="{padding:0+'px','text-align':'center'}"
       border
-      style="width:90%;margin-left:5%">
+      style="width:90%;margin-left:5%;margin-top:2%">
       <el-table-column
         prop="taskInfo"
         label="TaskInfo">
       </el-table-column>
     </el-table>
+
+    <!-- 弹出窗口 -->
+    <el-dialog
+      title="查看结果" 
+      :visible.sync="dialogVisible"
+      width="60%"
+      >
+      <el-form :model="profileForm" :rules="resultDetailRules" ref="profileForm" label-width="100px" style="width:95%">
+        <el-form-item label="task ID" prop="taskId">
+          <el-select v-model="chosenTaskId" style="width:100%">
+            <el-option v-for="item in tasksList" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="top" prop="top">
+          <el-input v-model="profileForm.groupId" placeholder="number of most time-consuming operators to print"></el-input>
+        </el-form-item>
+        <el-form-item label="type" prop="type">
+          <el-input v-model="profileForm.type" placeholder="filter oprs in the top list by type"></el-input>
+        </el-form-item>
+        <el-form-item label="aggregate-by" prop="aggregate-by">
+          <el-select v-model="profileForm.aggregateBy" style="width:100%" placeholder="aggragate profiling result by" >
+            <el-option v-for="item in aggregateBy" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="opr-name" prop="oprName">
+          <el-input v-model="profileForm.oprName" placeholder="filter oprs in the top list by regex of name"></el-input>
+        </el-form-item>
+        <el-form-item label="input-dtype" prop="inputDtype">
+          <el-input v-model="profileForm.inputDtype" placeholder="filter oprs in the top list by input dtype"></el-input>
+        </el-form-item>
+        <el-form-item label="top-end-key" prop="topEndKey">
+          <el-select v-model="profileForm.topEndKey" style="width:100%" placeholder="how time in top is calculated" >
+            <el-option v-for="item in topEndKey" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="aggregate" prop="aggregate">
+          <el-select v-model="profileForm.aggregate" style="width:100%" placeholder="aggregate operations" >
+            <el-option v-for="item in aggregate" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="order-by" prop="orderBy">
+          <el-input v-model="profileForm.orderBy" placeholder="sort result according to given column"></el-input>
+        </el-form-item>
+        <el-form-item label="copy-time" prop="copyTime">
+          <el-input v-model="profileForm.copyTime" placeholder="show copy time related result"></el-input>
+        </el-form-item>
+        <el-form-item label="min-time" prop="minTime">
+          <el-input v-model="profileForm.minTime" placeholder="minimal time of a result to be printed"></el-input>
+        </el-form-item>
+        <el-form-item label="max-time" prop="maxTime">
+          <el-input v-model="profileForm.maxTime" placeholder="maximal time of a result to be printed"></el-input>
+        </el-form-item>
+        <el-form-item label="show-host" prop="orderBy">
+          <el-input v-model="profileForm.orderBy" placeholder="show host profiling info"></el-input>
+        </el-form-item>
+        <el-form-item label="dump-only" prop="dumpOnly">
+          <el-input v-model="profileForm.dumpOnly" placeholder="only dump operator info as plaintext"></el-input>
+        </el-form-item>
+        <el-form-item label="confluence" prop="confluence">
+          <el-input v-model="profileForm.confluence" placeholder="output confluence-markdown-compatible table"></el-input>
+        </el-form-item>
+        <el-form-item label="print-only" prop="printOnly">
+          <el-select v-model="profileForm.printOnly" style="width:100%" placeholder="print only chosen info" >
+            <el-option v-for="item in printOnly" :label="item" :key="item" :value="item"/>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer" style="margin-right:10%">
+        <el-button @click="closeDialog">关 闭</el-button>
+        <el-button type="primary" @click="handleProfile()">查 看</el-button>
+      </span>
+    </el-dialog>
     
   </div>
 </template>
@@ -31,23 +98,76 @@ import taskApi from '@/api/task'
 export default {
   data(){
       return {
-        taskId: '', //用户输入的任务id
-        tasksInfoList: []          
+        taskProfile: [],
+        dialogVisible: false, //填充结果信息的弹出框
+        profileForm: {
+          taskId: '',
+          top: '',
+          type: '',
+          aggregateBy: '',
+          oprName: '',
+          inputDtype: '',
+          topEndKey: '',
+          aggregate: '',
+          orderBy: '',
+          copyTime: '',
+          minTime: '',
+          maxTime: '',
+          orderBy: '',
+          dumpOnly: '',
+          confluence: '',
+          printOnly: '',
+          
+        },
+        resultDetailRules: {
+          taskId: [{ required: true, message: '请选择任务', trigger: 'blur'}]
+        },          
+        tasksList: [], //该用户所有任务的taskId
+        chosenTaskId: '', //选中任务的taskId
+        aggregateBy: ["None","type"],
+        topEndKey: ["end","kern"],
+        aggregate: ["max", "min", "sum", "mean"],
+        printOnly: ["summary", "device", "host"],
       }
   },
+
+  created () {
+      this.fetchTasksId()
+  },
+
   methods: {
-      handleShow(){
-        if(this.taskId===''){
-          this.$message.error('请输入任务ID')
-          return false
-        }
-        taskApi.getTaskInfo(this.taskId).then(response =>{
-          this.tasksInfoList = response.data
-          console.log(this.tasksInfoList)
+
+      fetchTasksId(){
+        taskApi.getTasksId().then(response =>{
+          this.tasksList = response.data
         }).catch(() => {
-          this.taskInfo = ''
+          this.tasksList = []
         });
       },
+
+      handleProfile(){
+        this.$refs.profileForm.validate(valid => {
+          if(valid){
+            taskApi.taskProfile(this.profileForm).then(response =>{
+              this.taskProfile = response.data
+            }).catch(() => {
+              this.taskProfile = []
+            });
+          }
+        })
+      },
+      
+
+      closeDialog () {
+        this.dialogVisible = false
+      },
+
+      openDialog () {
+        this.dialogVisible = true
+        this.$nextTick(()=>{
+          this.$refs['profileForm'].resetFields()
+        })
+      }
   },
   watch: {
     '$route': 'fetchTasksID'

@@ -37,10 +37,18 @@ export default{
         });
     },
 
-    getTaskInfo(taskId){
+    getTasksId(){
         return request({
-            url: `/task/getinfo/${taskId}`,//ES6写法
+            url: `/task/getidlist`,//ES6写法
             method: 'get'
+        });
+    },
+
+    taskProfile(pojo){
+        return request({
+            url: `/task/taskprofile`,//ES6写法
+            method: 'post',
+            data: pojo
         });
     },
 } 
