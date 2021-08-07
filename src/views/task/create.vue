@@ -173,6 +173,7 @@ export default {
                     let formData = new FormData();
                     formData.append('taskId', this.newTaskId)
                     formData.append('saveFlag', this.saveFlag)
+                    formData.append('platform',this.chosenPlatform)
                     taskApi.saveTaskInfo(formData).then(response =>{
                       if(response.flag){
                         if(this.saveFlag){
