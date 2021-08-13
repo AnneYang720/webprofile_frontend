@@ -51,4 +51,11 @@ export default{
             data: pojo
         });
     },
+
+    netVisualize(taskId){
+        return request({
+            url: `/task/netvisualize/${taskId}`,//ES6写法
+            method: 'get'
+        });
+    },
 } 

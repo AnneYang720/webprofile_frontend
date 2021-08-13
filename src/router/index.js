@@ -61,6 +61,18 @@ export const constantRouterMap = [
         name: 'Result',
         component: () => import('@/views/task/result'),
         meta: { title: '任务结果', icon: 'table', reuse: false  }
+      },
+      // {
+      //   path: 'chart',
+      //   name: 'Chart',
+      //   component: () => import('@/views/task/chartdot'),
+      //   meta: { title: '模型预览dot', icon: 'table', reuse: false  }
+      // },
+      {
+        path: 'chart2',
+        name: 'Chart2',
+        component: () => import('@/views/task/chartnetron'),
+        meta: { title: '模型预览netron', icon: 'table', reuse: false  }
       }
     ]
   },
