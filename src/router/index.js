@@ -87,16 +87,16 @@ export const constantRouterMap = [
     meta: {roles: ['admin'], title: '管理', icon: 'example'}, // you can set roles in root nav
     children: [
       {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
-        meta: { title: 'Page Permission', roles: ['admin'] }
+        path: 'hardware',
+        component: () => import('@/views/permission/worker'),
+        name: 'Hardware',
+        meta: { title: '硬件信息', roles: ['admin'] }
       },
       {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
-        meta: { title: 'Role Permission', roles: ['admin'] }
+        path: 'user',
+        component: () => import('@/views/permission/user'),
+        name: 'User',
+        meta: { title: '用户权限', roles: ['admin'] }
       }
     ]
   },
