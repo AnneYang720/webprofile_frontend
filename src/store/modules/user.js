@@ -1,11 +1,13 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import  { resetRouter } from '@/router'
 
 const user = {
   state: {
     token: getToken(),
     email: '',
     userId:'',
+    roles: [],
   },
 
   mutations: {
@@ -17,7 +19,10 @@ const user = {
     },
     SET_USERID: (state, userId) => {
       state.userId = userId
-    }
+    },
+    SET_ROLES: (state, roles) => {
+      state.roles = roles
+    },
   },
 
   actions: {
@@ -38,10 +43,13 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo().then(response => {
+        getInfo(state.token).then(response => {
+          // roles must be a non-empty array
+          if (!response.data.roles || response.data.roles.length <= 0) {
+            reject('getInfo: roles must be a non-null array!')
+          }
+          commit('SET_ROLES', response.data.roles)
           commit('SET_EMAIL', response.data.email)
-          // commit('SET_AVATAR',"https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif")
-          commit('SET_AVATAR',"logo.png")
           commit('SET_USERID', response.data.id)
           resolve(response)
         }).catch(error => {
@@ -56,6 +64,7 @@ const user = {
         // logout(state.token).then(() => {
           commit('SET_TOKEN', '')
           removeToken()
+          resetRouter()
           resolve()
         // }).catch(error => {
         //   reject(error)
@@ -68,6 +77,7 @@ const user = {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
         removeToken()
+        resetRouter()
         resolve()
       })
     }

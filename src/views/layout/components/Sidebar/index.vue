@@ -1,7 +1,7 @@
 <template>
   <scroll-bar>
-    <el-menu mode="vertical" unique-opened :default-openeds='["Task","Reference"]' :default-active="$route.path" :collapse="isCollapse" background-color="#304156" text-color="#fff" active-text-color="#409EFF">
-      <sidebar-item :routes="routes"></sidebar-item>
+    <el-menu mode="vertical" :unique-opened="false" :collapse-transition="false" :default-openeds='["Task"]' :collapse="isCollapse" background-color="#304156" text-color="#fff" active-text-color="#409EFF">
+      <sidebar-item :routes="addRouters"></sidebar-item>
     </el-menu>
   </scroll-bar>
 </template>
@@ -15,11 +15,9 @@ export default {
   components: { SidebarItem, ScrollBar },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      'addRouters'
     ]),
-    routes() {
-      return this.$router.options.routes
-    },
     isCollapse() {
       return !this.sidebar.opened
     }

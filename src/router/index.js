@@ -62,17 +62,41 @@ export const constantRouterMap = [
         component: () => import('@/views/task/result'),
         meta: { title: '任务结果', icon: 'table', reuse: false  }
       },
-      // {
-      //   path: 'chart',
-      //   name: 'Chart',
-      //   component: () => import('@/views/task/chartdot'),
-      //   meta: { title: '模型预览dot', icon: 'table', reuse: false  }
-      // },
       {
-        path: 'chart2',
-        name: 'Chart2',
+        path: 'chart',
+        name: 'Chart',
         component: () => import('@/views/task/chartnetron'),
         meta: { title: '模型预览netron', icon: 'table', reuse: false  }
+      }
+    ]
+  },
+
+
+  { path: '*', redirect: '/404', hidden: true }
+]
+
+/**
+ * asyncRouterMap
+ * the routes that need to be dynamically loaded based on user roles
+ */
+ export const asyncRouterMap = [
+  {
+    path: '/permission',
+    component: Layout,
+    name: 'Permission',
+    meta: {roles: ['admin'], title: '管理', icon: 'example'}, // you can set roles in root nav
+    children: [
+      {
+        path: 'page',
+        component: () => import('@/views/permission/page'),
+        name: 'PagePermission',
+        meta: { title: 'Page Permission', roles: ['admin'] }
+      },
+      {
+        path: 'role',
+        component: () => import('@/views/permission/role'),
+        name: 'RolePermission',
+        meta: { title: 'Role Permission', roles: ['admin'] }
       }
     ]
   },
@@ -80,9 +104,25 @@ export const constantRouterMap = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-export default new Router({
-  // mode: 'history', //后端支持可开
+
+const createRouter = () => new Router({
+  // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
+
+const router = createRouter()
+
+// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+export function resetRouter() {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
+}
+
+export function selfaddRoutes(params) {
+  router.matcher = new Router().matcher;
+  router.addRoutes(params)
+}
+
+export default router
 
