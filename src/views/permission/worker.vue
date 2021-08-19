@@ -45,6 +45,12 @@
         label="状态"
         min-width="15%">
       </el-table-column>
+
+      <el-table-column
+        prop="auth"
+        label="权限"
+        min-width="15%">
+      </el-table-column>
       
     </el-table>
     

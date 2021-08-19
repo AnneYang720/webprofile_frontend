@@ -23,7 +23,7 @@
       </el-table-column>
 
       <el-table-column
-        prop="avlWorker"
+        prop="workers"
         label="可用硬件"
         min-width="20%">
       </el-table-column>
@@ -57,7 +57,7 @@
       <div>
       <div style="line-height:40px;margin-left:5%"> Worker
       <el-select v-model="work_add" style="margin-left:50px">
-        <el-option v-for="item in allWorkerList" :label="item.name" :key="item._id" :value="item._id"/>
+        <el-option v-for="item in priWorkerList" :label="item.name" :key="item._id" :value="item._id"/>
       </el-select>
       </div>
 
@@ -98,7 +98,7 @@ export default {
           work_add: '', //待添加给用户的worker
           work_del: '',
           chosenUser: '',
-          allWorkerList: [],
+          priWorkerList: [],
           curWorkerList: [],
         }
     },
@@ -106,25 +106,25 @@ export default {
         this.fetchUsersList()
     },
     methods: {
+      // TODO 用户信息的显示（角色和设备显示的处理）
         fetchUsersList(){
             // console.log("fetch"+this.currentPage+' '+this.pageSize);
             adminApi.getUsersList().then(response =>{
                 this.userList = response.data;
-                this.fetchworkersList();
+                this.fetchPrivateWorkersList();
             }).catch((err) => {
                 this.userList = []
           });
         },
 
-        fetchworkersList(){
+        fetchPrivateWorkersList(){
             // console.log("fetch"+this.currentPage+' '+this.pageSize);
-            adminApi.getWorkersList().then(response =>{
-                this.allWorkerList = response.data;
+            adminApi.getPrivateWorkersList().then(response =>{
+                this.priWorkerList = response.data;
             }).catch((err) => {
-                this.allWorkerList = []
+                this.priWorkerList = []
             });
         },
-
       
         addWorker(){
             adminApi.addWorker(this.chosenUser,this.work_add).then(response =>{
@@ -169,7 +169,7 @@ export default {
 
         openDel(row){
           this.delVisible = true
-          this.curWorkerList = row.avlWorker
+          this.curWorkerList = row.workers
           this.work_del = ''
           this.chosenUser = row._id
         },
