@@ -88,13 +88,13 @@ export const constantRouterMap = [
     children: [
       {
         path: 'hardware',
-        component: () => import('@/views/permission/worker'),
+        component: () => import('@/views/admin/worker'),
         name: 'Hardware',
         meta: { title: '硬件信息', roles: ['admin'] }
       },
       {
         path: 'user',
-        component: () => import('@/views/permission/user'),
+        component: () => import('@/views/admin/user'),
         name: 'User',
         meta: { title: '用户权限', roles: ['admin'] }
       }

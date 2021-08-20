@@ -35,7 +35,7 @@
       </el-table-column>
 
       <el-table-column
-        prop="meg_version"
+        prop="mge_version"
         label="MegEngine版本"
         min-width="25%">
       </el-table-column>
