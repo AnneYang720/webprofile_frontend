@@ -2,8 +2,8 @@
   <div>
     <br>
       <div style="line-height:40px;margin-left:5%"> 新建项目</div>
-      <el-form label-width="100px" style="margin-left:5%">
-        
+      
+      <el-form label-width="100px" style="margin-left:5%">  
         <el-form-item label="mge模型">
           <el-upload
             ref="uploadMGE"
@@ -34,7 +34,7 @@
 
         <el-form-item label="worker">
           <el-select v-model="chosenWorker" @change="workerChange" >
-            <el-option v-for="item in wList" :label="item" :key="item" :value="item"/>
+            <el-option v-for="item in myWorkerList" :label="item.name" :key="item.name" :value="item.name"/>
           </el-select>
         </el-form-item>
 
@@ -47,8 +47,61 @@
         </el-form-item>
 
       </el-form>
-      
+
       <el-button style="margin-left:5%" type="primary" @click="handleUpload()">创 建</el-button>
+
+      <el-table
+        :data="myWorkerList"
+        :row-style="{height:40+'px'}"
+        style="width:90%;margin-left:5%;margin-top:2%">
+
+        <el-table-column
+          prop="_id"
+          label="硬件ID"
+          min-width="30%">
+          <template slot-scope="scope">
+            <span style="color: DodgerBlue">{{ scope.row._id }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          prop="name"
+          label="名称"
+          min-width="15%">
+        </el-table-column>
+
+        <el-table-column
+          prop="ip"
+          label="IP地址"
+          min-width="15%">
+        </el-table-column>
+
+        <el-table-column
+          prop="platform"
+          label="平台架构"
+          min-width="15%">
+        </el-table-column>
+
+        <el-table-column
+          prop="mge_version"
+          label="MegEngine版本"
+          min-width="20%">
+        </el-table-column>
+
+        <el-table-column
+          prop="state"
+          label="状态"
+          min-width="15%">
+        </el-table-column>
+
+        <el-table-column
+          prop="auth"
+          label="权限"
+          min-width="15%">
+        </el-table-column>
+      
+      </el-table>
+
 
   </div>
 </template>
@@ -66,7 +119,7 @@ export default {
           chosenWorker: '',
           chosenPlatform: '',
           chosenVersion: '',
-          wList: [], //该用户可选的平台架构list
+          myWorkerList: [], //该用户可选的平台架构list
           uploadMgeUrl: '',
           uploadDataUrl: '',
           newTaskId: '',
@@ -80,8 +133,9 @@ export default {
         // 获取该用户可用的硬件
         fetchMyWorkersList(){
           taskApi.getMyWorkersList().then(response =>{
-            this.wList = response.data
+            this.myWorkerList = response.data
           }).catch(() => {
+            this.myWorkerList = []
             this.$message({
               message: response.message,
               type: (response.flag ? 'success':'error')
