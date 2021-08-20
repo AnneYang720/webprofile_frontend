@@ -21,7 +21,7 @@
         <el-form-item label="数据">
           <el-upload
             ref="uploadData"
-            accept='.pickle'
+            accept='.npy'
             :action="uploadDataUrl"
             :multiple="false"
             :auto-upload="false"
@@ -32,16 +32,18 @@
           </el-upload>
         </el-form-item>
 
-        <el-form-item label="平台">
-          <el-select v-model="chosenPlatform" @change="platformChange" >
-            <el-option v-for="item in pList" :label="item" :key="item" :value="item"/>
+        <el-form-item label="worker">
+          <el-select v-model="chosenWorker" @change="workerChange" >
+            <el-option v-for="item in wList" :label="item" :key="item" :value="item"/>
           </el-select>
         </el-form-item>
 
+        <el-form-item label="架构">
+          <div> {{chosenPlatform}} </div>
+        </el-form-item>
+
         <el-form-item label="版本">
-          <el-select v-model="chosenVersion" >
-            <el-option v-for="item in vList" :label="item" :key="item" :value="item"/>
-          </el-select>
+          <div> {{chosenVersion}} </div>
         </el-form-item>
 
       </el-form>
@@ -54,16 +56,17 @@
 
 import taskApi from '@/api/task'
 import {pFileReader} from '@/utils/filereader'
+import axios from 'axios'
 
 export default {
     data(){
         return {
           uploadMGEList: [],
           uploadDataList: [],
+          chosenWorker: '',
           chosenPlatform: '',
           chosenVersion: '',
-          pList: [], //该用户可选的平台架构list
-          vList: [], //选中架构后，该用户可选的MegEngine版本list
+          wList: [], //该用户可选的平台架构list
           uploadMgeUrl: '',
           uploadDataUrl: '',
           newTaskId: '',
@@ -71,13 +74,13 @@ export default {
         }
     },
     created () {
-        this.fetchPlatformList()
+        this.fetchMyWorkersList()
     },
     methods: {
-        // 获取该用户可用的平台
-        fetchPlatformList(){
-          taskApi.getPlatformList().then(response =>{
-            this.pList = response.data
+        // 获取该用户可用的硬件
+        fetchMyWorkersList(){
+          taskApi.getMyWorkersList().then(response =>{
+            this.wList = response.data
           }).catch(() => {
             this.$message({
               message: response.message,
@@ -101,9 +104,10 @@ export default {
         },
 
         //更改平台架构后获得新的MegEngine版本
-        platformChange(){
-          taskApi.getVList(this.chosenPlatform).then(response =>{
-            this.vList = response.data
+        workerChange(){
+          taskApi.getWorkerInfo(this.chosenWorker).then(response =>{
+            this.chosenPlatform = response.data.platform
+            this.chosenVersion = response.data.mge_version
           }).catch(() => {
             this.$message({
               message: response.message,
@@ -121,12 +125,8 @@ export default {
             this.$message.error('数据文件必须上传')
             return false
           }
-          if(this.chosenPlatform==''){
-            this.$message.error('请选择平台架构')
-            return false
-          }
-          if(this.chosenVersion==''){
-            this.$message.error('请选择MegEngine版本')
+          if(this.chosenWorker==''){
+            this.$message.error('请选择硬件')
             return false
           }
           return true
@@ -186,6 +186,7 @@ export default {
                         this.$message.error('新任务创建失败')
                       }
                     })
+                    
 
                   }else{
                     this.$message.error('创建上传URL失败!!')
@@ -199,15 +200,12 @@ export default {
         closeUpload(){
           this.uploadMGEList = []
           this.uploadDataList= []
+          this.chosenWorker = ''
           this.chosenPlatform= ''
           this.chosenVersion= ''
-          this.vList = []
         },
 
-    },
-    watch: {
-      '$route': 'fetchPlatformList'
-    },
+    }
 }
       
 </script>

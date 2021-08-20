@@ -1,15 +1,15 @@
 import request from '@/utils/request'
 export default{
-    getVList(chosenPlatform){
+    getWorkerInfo(chosenWorker){
         return request({
-            url: `/task/getvlist/${chosenPlatform}`,
+            url: `/getworkinfo/${chosenWorker}`,
             method: 'get'
         })
     },
     
-    getPlatformList(){
+    getMyWorkersList(){
         return request({
-            url: `/task/getplatform`,//ES6写法
+            url: `/getmyworkerslist`,
             method: 'get'
         });
     },
