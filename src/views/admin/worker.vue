@@ -37,12 +37,14 @@
       <el-table-column
         prop="mge_version"
         label="MegEngine版本"
+        :formatter="formatList"
         min-width="25%">
       </el-table-column>
 
       <el-table-column
-        prop="state"
-        label="状态"
+        prop="updateTime"
+        label="上次更新时间"
+        :formatter="formatDate"
         min-width="15%">
       </el-table-column>
 
@@ -76,6 +78,17 @@ export default {
             }).catch((err) => {
                 this.workerList = []
           });
+        },
+
+        formatList(row, column) {
+          return row[column.property].join(", ")
+        },
+
+        formatDate(row, column) {
+          let data = row[column.property]
+          let dt = new Date(data)
+          console.log(dt)
+          return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
         },
 
     },

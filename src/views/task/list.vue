@@ -19,19 +19,19 @@
       <el-table-column
         prop="mge_name"
         label="MGE模型"
-        min-width="25%">
+        min-width="18%">
       </el-table-column>
 
       <el-table-column
         prop="data_name"
         label="数据DATA"
-        min-width="25%">
+        min-width="18%">
       </el-table-column>
 
       <el-table-column
-        prop="platform"
-        label="平台"
-        min-width="10%">
+        prop="worker"
+        label="worker"
+        min-width="15%">
       </el-table-column>
 
       <el-table-column
@@ -41,7 +41,7 @@
       </el-table-column>
 
       <el-table-column
-        prop="time"
+        prop="updateTime"
         label="更新时间"
         :formatter="formatDate"
         min-width="20%">
@@ -108,6 +108,7 @@ export default {
         formatDate(row, column) {
           let data = row[column.property]
           let dt = new Date(data)
+          console.log(dt)
           return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
         },
     },

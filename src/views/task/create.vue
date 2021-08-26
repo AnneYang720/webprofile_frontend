@@ -43,7 +43,9 @@
         </el-form-item>
 
         <el-form-item label="版本">
-          <div> {{chosenVersion}} </div>
+          <el-select v-model="chosenVersion" >
+            <el-option v-for="item in chosenVersionList" :label="item" :key="item" :value="item"/>
+          </el-select>
         </el-form-item>
 
       </el-form>
@@ -85,13 +87,8 @@
         <el-table-column
           prop="mge_version"
           label="MegEngine版本"
+          :formatter="formatList"
           min-width="20%">
-        </el-table-column>
-
-        <el-table-column
-          prop="state"
-          label="状态"
-          min-width="15%">
         </el-table-column>
 
         <el-table-column
@@ -99,6 +96,13 @@
           label="权限"
           min-width="15%">
         </el-table-column>
+
+        <el-table-column
+        prop="updateTime"
+        label="更新时间"
+        :formatter="formatDate"
+        min-width="15%">
+      </el-table-column>
       
       </el-table>
 
@@ -119,6 +123,7 @@ export default {
           chosenWorker: '',
           chosenPlatform: '',
           chosenVersion: '',
+          chosenVersionList:[],
           myWorkerList: [], //该用户可选的平台架构list
           uploadMgeUrl: '',
           uploadDataUrl: '',
@@ -161,7 +166,7 @@ export default {
         workerChange(){
           taskApi.getWorkerInfo(this.chosenWorker).then(response =>{
             this.chosenPlatform = response.data.platform
-            this.chosenVersion = response.data.mge_version
+            this.chosenVersionList = response.data.mge_version
           }).catch(() => {
             this.$message({
               message: response.message,
@@ -195,12 +200,8 @@ export default {
           }).then(async() => {
             // TODO: Decide file is this.uploadMGEList[0] or this.uploadMGEList[0].raw
             if(this.beforeUpload()){
-              console.log(typeof this.uploadMGEList[0].name)
-              console.log(typeof this.uploadMGEList[0].raw.name)
-              console.log(typeof this.uploadMGEList[0])
-              console.log(typeof this.uploadMGEList[0].raw)
               let formData = new FormData();
-              formData.append('platform', this.chosenPlatform)
+              formData.append('worker', this.chosenWorker)
               formData.append('version', this.chosenVersion)
               formData.append('mge_name',this.uploadMGEList[0].name)
               formData.append('data_name',this.uploadDataList[0].name)
@@ -227,7 +228,8 @@ export default {
                     let formData = new FormData();
                     formData.append('taskId', this.newTaskId)
                     formData.append('saveFlag', this.saveFlag)
-                    formData.append('platform',this.chosenPlatform)
+                    formData.append('worker',this.chosenWorker)
+                    formData.append('version', this.chosenVersion)
                     taskApi.saveTaskInfo(formData).then(response =>{
                       if(response.flag){
                         if(this.saveFlag){
@@ -254,9 +256,20 @@ export default {
         closeUpload(){
           this.uploadMGEList = []
           this.uploadDataList= []
+          this.chosenVersionList = []
           this.chosenWorker = ''
           this.chosenPlatform= ''
           this.chosenVersion= ''
+        },
+
+        formatList(row, column) {
+          return row[column.property].join(", ")
+        },
+
+        formatDate(row, column) {
+          let data = row[column.property]
+          let dt = new Date(data)
+          return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
         },
 
     }
