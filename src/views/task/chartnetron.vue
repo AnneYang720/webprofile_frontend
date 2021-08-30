@@ -53,7 +53,10 @@ export default {
 
         getParams(){
             this.chosenTaskId = this.$route.query.taskId
-            // this.handleNetVisualize()
+            if(this.$route.query.taskId){
+                console.log(this.chosenTaskId)
+                this.handleNetVisualize()
+            }
         },
 
     },

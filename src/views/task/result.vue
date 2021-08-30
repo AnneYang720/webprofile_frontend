@@ -308,8 +308,10 @@ export default {
         this.inputValue = '';
       },
       getParams(){
-        this.dialogVisible = true
-        this.profileForm.taskId = this.$route.query.taskId
+        if(this.$route.query.taskId){
+          this.dialogVisible = true
+          this.profileForm.taskId = this.$route.query.taskId
+        }
       },
   },
   watch: {

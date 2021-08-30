@@ -83,6 +83,15 @@
       style="margin-top:3%">
     </el-pagination>
 
+    <!-- 弹出窗口 -->
+    <el-dialog
+      title="任务日志" 
+      :visible.sync="dialogVisible"
+      width="60%"
+      >
+      <div> {{this.failInfo}} </div>
+    </el-dialog>
+
 
   </div>
 
@@ -91,6 +100,7 @@
 </template>
 <script>
 import taskApi from '@/api/task'
+import axios from 'axios'
 export default {
     data(){
         return {
@@ -98,7 +108,8 @@ export default {
           total:  0, //总条数
           currentPage: 1, //当前页数
           pageSize: 10, //每页条数
-          output_url: '',
+          dialogVisible: false,
+          failInfo: '',
         }
     },
     created () {
@@ -141,20 +152,15 @@ export default {
         },
 
         openFailInfo(taskId){
-          taskApi.getFailInfoUrl(taskId).then(response =>{
-            this.output_url = response.data
-            console.log(this.output_url)
-            var ele = document.createElement('a')
-            ele.download = 'failed_output_'+taskId
-            ele.style.display = 'none';
-            ele.href = this.output_url
-            ele.target="_blank"; // 针对 ie模式 的浏览器
-            document.body.appendChild(ele);
-            ele.click();
-            document.body.removeChild(ele);
-          }).catch(() => {
-              this.output_url = ''
-          })
+          taskApi.getFailInfoUrl(taskId)
+            .then(resp => axios.get(resp.data))
+            .then(resp => {
+              this.dialogVisible = true
+              this.failInfo = resp.data
+            }).catch((err) => {
+              this.dialogVisible = false
+              this.failInfo = ''
+            });
         },
 
         toResult(row){
