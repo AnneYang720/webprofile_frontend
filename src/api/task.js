@@ -58,4 +58,11 @@ export default{
             method: 'get'
         });
     },
+
+    getFailInfoUrl(taskId){
+        return request({
+            url: `/task/getfailinfo/${taskId}`,//ES6写法
+            method: 'get'
+        });
+    },
 } 

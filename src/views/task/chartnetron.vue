@@ -19,11 +19,13 @@ export default {
             tasksList: [], //该用户所有任务的taskId
             log_url: '',
             chosenTaskId: '',
+            routerParams: '',
             
         }
     },
     created () {
         this.fetchTasksId()
+        this.getParams()
     },
     methods: {
         // 获取所有任务id列表
@@ -49,6 +51,14 @@ export default {
 
         },
 
+        getParams(){
+            this.chosenTaskId = this.$route.query.taskId
+            // this.handleNetVisualize()
+        },
+
+    },
+    watch:{
+        '$route': 'getParams'
     }
   
 };

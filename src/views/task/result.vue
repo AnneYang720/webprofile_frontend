@@ -252,6 +252,7 @@ export default {
 
   created () {
       this.fetchTasksId()
+      this.getParams()
   },
 
   methods: {
@@ -306,9 +307,13 @@ export default {
         this.inputVisible = false;
         this.inputValue = '';
       },
+      getParams(){
+        this.dialogVisible = true
+        this.profileForm.taskId = this.$route.query.taskId
+      },
   },
   watch: {
-    '$route': 'fetchTasksID'
+    '$route': 'fetchTasksId'
   },
 }
       

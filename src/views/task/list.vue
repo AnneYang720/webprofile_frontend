@@ -5,7 +5,7 @@
     <el-table
       :data="tasksList"
       :row-style="{height:40+'px'}"
-      style="width:80%;margin-left:10%;margin-top:2%">
+      style="width:90%;margin-left:5%;margin-top:2%">
 
       <el-table-column
         prop="_id"
@@ -52,6 +52,22 @@
         label="任务状态"
         min-width="15%">
       </el-table-column>
+
+      <el-table-column
+        label="结果"
+        min-width="6%">
+        <template slot-scope="scope">
+          <el-button @click.native.stop="toResult(scope.row)" type="text" size="small">查看</el-button>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        label="模型"
+        min-width="6%">
+        <template slot-scope="scope">
+          <el-button @click.native.stop="toChart(scope.row)" type="text" size="small">查看</el-button>
+        </template>
+      </el-table-column>
       
     </el-table>
     
@@ -67,7 +83,11 @@
       style="margin-top:3%">
     </el-pagination>
 
+
   </div>
+
+
+
 </template>
 <script>
 import taskApi from '@/api/task'
@@ -78,6 +98,7 @@ export default {
           total:  0, //总条数
           currentPage: 1, //当前页数
           pageSize: 10, //每页条数
+          output_url: '',
         }
     },
     created () {
@@ -108,8 +129,47 @@ export default {
         formatDate(row, column) {
           let data = row[column.property]
           let dt = new Date(data)
-          console.log(dt)
+          // console.log(dt)
           return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
+        },
+
+        toChart(row){
+          this.$router.push({
+            path:'/task/chart',
+            query: {taskId:row._id}
+          })
+        },
+
+        openFailInfo(taskId){
+          taskApi.getFailInfoUrl(taskId).then(response =>{
+            this.output_url = response.data
+            console.log(this.output_url)
+            var ele = document.createElement('a')
+            ele.download = 'failed_output_'+taskId
+            ele.style.display = 'none';
+            ele.href = this.output_url
+            ele.target="_blank"; // 针对 ie模式 的浏览器
+            document.body.appendChild(ele);
+            ele.click();
+            document.body.removeChild(ele);
+          }).catch(() => {
+              this.output_url = ''
+          })
+        },
+
+        toResult(row){
+          if(row.state == 'initiated' ||row.state == 'waiting'){
+            this.$message.error('该任务还未产生结果')
+            return false
+          }
+          if(row.state == 'failed'){
+            this.openFailInfo(row._id)
+            return false
+          }
+          this.$router.push({
+            path:'/task/result',
+            query: {taskId:row._id}
+          })
         },
     },
     watch: {

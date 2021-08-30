@@ -213,14 +213,12 @@ export default {
 
                     let e_mge = await pFileReader(this.uploadMGEList[0].raw)
                     let res_mge = await axios.put(this.uploadMgeUrl, new Buffer(e_mge.target.result, 'binary'))
-                    console.log(res_mge)
                     if(res_mge.status!=200){
                       this.saveFlag = false
                     }
 
                     let e_data = await pFileReader(this.uploadDataList[0].raw)
                     let res_data = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
-                    console.log(res_data)
                     if(res_data.status!=200){
                       this.saveFlag = false
                     }
