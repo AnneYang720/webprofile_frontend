@@ -1,7 +1,7 @@
 <template>
   <div>
     <br>
-      <div style="line-height:40px;margin-left:5%"> 新建项目</div>
+      <div style="line-height:60px;margin-left:5%;font-size:20px"> 新建任务</div>
       
       <el-form label-width="100px" style="margin-left:5%">  
         <el-form-item label="mge模型">
@@ -48,14 +48,22 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item label="附加参数">
+          <el-col :span="8">
+            <el-input v-model="args" placeholder="选填附加参数"></el-input>
+          </el-col>
+        </el-form-item>
+
       </el-form>
 
-      <el-button style="margin-left:5%" type="primary" @click="handleUpload()">创 建</el-button>
+      <el-button style="margin-left:5%" type="primary"  :loading="loading" @click="handleUpload()">创 建</el-button>
 
+      <div style="line-height:60px;margin-left:5%;font-size:20px;margin-top:2%"> 可用硬件</div>
+      
       <el-table
         :data="myWorkerList"
         :row-style="{height:40+'px'}"
-        style="width:90%;margin-left:5%;margin-top:2%">
+        style="width:90%;margin-left:5%">
 
         <el-table-column
           prop="_id"
@@ -101,7 +109,7 @@
         prop="updateTime"
         label="更新时间"
         :formatter="formatDate"
-        min-width="15%">
+        min-width="17%">
       </el-table-column>
       
       </el-table>
@@ -123,12 +131,14 @@ export default {
           chosenWorker: '',
           chosenPlatform: '',
           chosenVersion: '',
+          args: '',
           chosenVersionList:[],
           myWorkerList: [], //该用户可选的平台架构list
           uploadMgeUrl: '',
           uploadDataUrl: '',
           newTaskId: '',
           saveFlag:true, //两个文件通过url直接上传是否成功
+          loading: false,
         }
     },
     created () {
@@ -176,6 +186,7 @@ export default {
         },
 
         beforeUpload(){
+          this.saveFlag = true
           if(this.uploadMGEList.length==0){
             this.$message.error('MGE模型文件必须上传')
             return false
@@ -200,6 +211,7 @@ export default {
           }).then(async() => {
             // TODO: Decide file is this.uploadMGEList[0] or this.uploadMGEList[0].raw
             if(this.beforeUpload()){
+              this.loading = true
               let formData = new FormData();
               formData.append('worker', this.chosenWorker)
               formData.append('version', this.chosenVersion)
@@ -215,19 +227,23 @@ export default {
                     let res_mge = await axios.put(this.uploadMgeUrl, new Buffer(e_mge.target.result, 'binary'))
                     if(res_mge.status!=200){
                       this.saveFlag = false
+                      console.log("mge fail")
                     }
 
                     let e_data = await pFileReader(this.uploadDataList[0].raw)
                     let res_data = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
                     if(res_data.status!=200){
                       this.saveFlag = false
+                      console.log("data fail")
                     }
 
+                    console.log(this.saveFlag)
                     let formData = new FormData();
                     formData.append('taskId', this.newTaskId)
                     formData.append('saveFlag', this.saveFlag)
                     formData.append('worker',this.chosenWorker)
                     formData.append('version', this.chosenVersion)
+                    formData.append('args',this.args)
                     taskApi.saveTaskInfo(formData).then(response =>{
                       if(response.flag){
                         if(this.saveFlag){
@@ -246,6 +262,7 @@ export default {
                     this.$message.error('创建上传URL失败!!')
                     return false
                   }
+                  this.loading = false
               })
             }
           })
@@ -255,6 +272,7 @@ export default {
           this.uploadMGEList = []
           this.uploadDataList= []
           this.chosenVersionList = []
+          this.args = ''
           this.chosenWorker = ''
           this.chosenPlatform= ''
           this.chosenVersion= ''
@@ -287,6 +305,7 @@ export default {
     font-weight: 600;
   }
 }
+
 .el-table--enable-row-hover .el-table__body tr:hover>td{
 	background-color: rgba(185,211,249,0.75);
 }

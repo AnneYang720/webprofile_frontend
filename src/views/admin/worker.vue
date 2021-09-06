@@ -5,7 +5,7 @@
     <el-table
       :data="workerList"
       :row-style="{height:40+'px'}"
-      style="width:80%;margin-left:10%;margin-top:2%">
+      style="width:90%;margin-left:5%;margin-top:2%">
 
       <el-table-column
         prop="_id"
@@ -19,7 +19,7 @@
       <el-table-column
         prop="name"
         label="名称"
-        min-width="20%">
+        min-width="15%">
       </el-table-column>
 
       <el-table-column
@@ -87,7 +87,6 @@ export default {
         formatDate(row, column) {
           let data = row[column.property]
           let dt = new Date(data)
-          console.log(dt)
           return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes()
         },
 

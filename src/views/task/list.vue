@@ -30,7 +30,7 @@
 
       <el-table-column
         prop="worker"
-        label="worker"
+        label="Worker"
         min-width="15%">
       </el-table-column>
 

@@ -212,7 +212,7 @@ export default {
                 this.fetchPrivateWorkersList();
             }).catch((err) => {
                 this.userList = []
-          });
+            });
         },
 
         fetchPrivateWorkersList(){

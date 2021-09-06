@@ -4,6 +4,9 @@
     
     <el-button @click="openDialog" type="primary" style="margin-left:5%;margin-top:2%" plain>查看结果</el-button>
 
+    <div style="margin-left:5%;margin-top:2%;font-size:20px"> total device time: {{this.totDevTime}}</div>
+    <div style="margin-left:5%;font-size:20px"> total host time: {{this.totHosttime}}</div>
+
     <el-table
       :data="taskDevProfile"
       :row-style="{height:0+'px'}"
@@ -269,6 +272,7 @@ export default {
         this.$refs.profileForm.validate(valid => {
           if(valid){
             this.closeDialog()
+            console.log(this.profileForm)
             taskApi.taskProfile(this.profileForm).then(response =>{
               this.taskDevProfile = response.deviceList
               this.taskHostProfile = response.hostList
@@ -287,9 +291,9 @@ export default {
 
       openDialog () {
         this.dialogVisible = true
-        this.$nextTick(()=>{
-          this.$refs['profileForm'].resetFields()
-        })
+        // this.$nextTick(()=>{
+        //   this.$refs['profileForm'].resetFields()
+        // })
       },
 
       handleClose(tag) {this.profileForm.type.splice(this.profileForm.type.indexOf(tag), 1);},

@@ -8,7 +8,7 @@
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="email" type="text" v-model="signupForm.email" placeholder="email" />
+        <el-input name="email" type="text" v-model="signupForm.email" placeholder="邮箱" />
       </el-form-item>
 
       <el-form-item prop="password">
@@ -16,7 +16,7 @@
           <svg-icon icon-class="password"></svg-icon>
         </span>
         <el-input name="password" :type="pwdType" v-model="signupForm.password" 
-          placeholder="password"></el-input>
+          placeholder="密码"></el-input>
           <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
       <el-form-item>
@@ -76,13 +76,16 @@ export default {
         if(valid){
           this.signupForm.password = this.mdpassword
           signup(this.signupForm).then(response =>{
-            this.$message({
-              message: response.message,
-              type: (response.flag ? 'success':'error')
-            });
-            if(response.flag){//如果成功
-              this.$router.push({ path: '/' })
+            console.log(response)
+            if(response.flag){
+              console.log("successcccc")
+              this.$message.success("注册成功")
+              this.$router.push('/login')
+            } else{
+              this.$message.error(response.message)
             }
+          }).catch(err => {
+            console.log(err)
           })
         }
       })

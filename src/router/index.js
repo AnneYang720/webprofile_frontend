@@ -66,7 +66,7 @@ export const constantRouterMap = [
         path: 'chart',
         name: 'Chart',
         component: () => import('@/views/task/chartnetron'),
-        meta: { title: '模型预览netron', icon: 'table', reuse: false  }
+        meta: { title: '模型预览', icon: 'table', reuse: false  }
       }
     ]
   },
