@@ -5,31 +5,35 @@
       
       <el-form label-width="100px" style="margin-left:5%">  
         <el-form-item label="mge模型">
-          <el-upload
-            ref="uploadMGE"
-            accept=".mge"
-            :action="uploadMgeUrl"
-            :multiple="false"
-            :auto-upload="false"
-            :show-file-list="true"
-            :file-list="uploadMGEList"
-            :on-change="handleMGEUploadChange">
-            <el-button type="primary" slot="trigger">选取文件</el-button>
-          </el-upload>
+          <el-col :span="4">
+            <el-upload
+              ref="uploadMGE"
+              accept=".mge"
+              :action="uploadMgeUrl"
+              :multiple="false"
+              :auto-upload="false"
+              :show-file-list="true"
+              :file-list="uploadMGEList"
+              :on-change="handleMGEUploadChange">
+              <el-button type="primary" slot="trigger">选取文件</el-button>
+            </el-upload>
+          </el-col>
         </el-form-item>
 
         <el-form-item label="数据">
-          <el-upload
-            ref="uploadData"
-            accept='.npy'
-            :action="uploadDataUrl"
-            :multiple="false"
-            :auto-upload="false"
-            :show-file-list="true"
-            :file-list="uploadDataList"
-            :on-change="handleDataUploadChange">
-            <el-button type="primary" slot="trigger">选取文件</el-button>
-          </el-upload>
+          <el-col :span="4">
+            <el-upload
+              ref="uploadData"
+              accept='.npy'
+              :action="uploadDataUrl"
+              multiple
+              :auto-upload="false"
+              :show-file-list="true"
+              :file-list="uploadDataList"
+              :on-change="handleDataUploadChange">
+              <el-button type="primary" slot="trigger">选取文件</el-button>
+            </el-upload>
+          </el-col>
         </el-form-item>
 
         <el-form-item label="worker">
@@ -122,6 +126,7 @@
 import taskApi from '@/api/task'
 import {pFileReader} from '@/utils/filereader'
 import axios from 'axios'
+import JSZip from 'jszip'
 
 export default {
     data(){
@@ -162,14 +167,17 @@ export default {
         handleMGEUploadChange(file, uploadMGEList) {
             if (uploadMGEList.length > 0) {
                 this.uploadMGEList = [uploadMGEList[uploadMGEList.length - 1]] // 展示最后一次选择的文件
-            }
+            }            
         },
 
-        // 限制数据文件上传的个数只有一个，获取上传列表的最后一个
+        // 数据文件上传，文件不能重复
         handleDataUploadChange(file, uploadDataList) {
-            if (uploadDataList.length > 0) {
-                this.uploadDataList = [uploadDataList[uploadDataList.length - 1]] // 展示最后一次选择的文件
-            }
+            let existFile = uploadDataList.slice(0, uploadDataList.length - 1).find(f => f.name === file.name);
+                if (existFile) {
+                    console.log('当前文件已经存在!');
+                    uploadDataList.pop();
+                }
+            this.uploadDataList = uploadDataList
         },
 
         //更改平台架构后获得新的MegEngine版本
@@ -209,14 +217,18 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(async() => {
-            // TODO: Decide file is this.uploadMGEList[0] or this.uploadMGEList[0].raw
             if(this.beforeUpload()){
               this.loading = true
               let formData = new FormData();
+              let dataName = []
+              this.uploadDataList.forEach(function(obj) {
+                dataName.push(obj.name)
+              })
               formData.append('worker', this.chosenWorker)
               formData.append('version', this.chosenVersion)
               formData.append('mge_name',this.uploadMGEList[0].name)
-              formData.append('data_name',this.uploadDataList[0].name)
+              formData.append('data_name',dataName)
+
               taskApi.createTaskUrl(formData).then(async(response) => {
                   if(response.flag){//如果成功
                     this.uploadMgeUrl = response.data.mgeUrl
@@ -230,8 +242,13 @@ export default {
                       console.log("mge fail")
                     }
 
-                    let e_data = await pFileReader(this.uploadDataList[0].raw)
-                    let res_data = await axios.put(this.uploadDataUrl, new Buffer(e_data.target.result, 'binary'))
+                    var zip = new JSZip();
+                    this.uploadDataList.forEach(function(obj) {
+                      zip.file(obj.name,obj.raw)
+                    })
+
+                    let content = await zip.generateAsync({ type: 'uint8array'})
+                    let res_data = await axios.put(this.uploadDataUrl, new Buffer(content, 'binary'))
                     if(res_data.status!=200){
                       this.saveFlag = false
                       console.log("data fail")
