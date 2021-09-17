@@ -25,13 +25,3 @@ export function getInfo() {
     method: 'get'
   })
 }
-
-export function updateInfo(pojo){
-  return request({
-      url: '/user/saveinfo',
-      method: 'put',
-      data: pojo
-  })
-}
-
-

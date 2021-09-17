@@ -257,7 +257,7 @@ export default {
       this.fetchTasksId()
       this.getParams()
   },
-
+// TODO 错误日志 换行
   methods: {
 
       fetchTasksId(){
@@ -276,8 +276,8 @@ export default {
             taskApi.taskProfile(this.profileForm).then(response =>{
               this.taskDevProfile = response.deviceList
               this.taskHostProfile = response.hostList
-              this.totDevTime = response.tot_dev_time
-              this.totHosttime = response.tot_host_time
+              this.totDevTime = response.tot_dev_time + " s"
+              this.totHosttime = response.tot_host_time + " s"
             }).catch(() => {
               this.taskProfile = []
             });

@@ -175,6 +175,10 @@ export default {
             let existFile = uploadDataList.slice(0, uploadDataList.length - 1).find(f => f.name === file.name);
                 if (existFile) {
                     console.log('当前文件已经存在!');
+                    this.$message({
+                      message: '当前文件已经存在! 新选中文件未上传',
+                      type: 'error'
+                    })
                     uploadDataList.pop();
                 }
             this.uploadDataList = uploadDataList

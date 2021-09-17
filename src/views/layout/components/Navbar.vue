@@ -9,34 +9,13 @@
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
-        <el-dropdown-item @click.native="dialogVisible = true" >
-          <span type="text" size="small">个人设置</span>
-        </el-dropdown-item>
         <el-dropdown-item @click.native="logout" divided>
           <span style="display:block;">退出登录</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
 
-    <el-dialog
-      title="个人设置" 
-      :visible.sync="dialogVisible"
-      width="30%"
-      >
 
-      <el-form label-width="20%" style="width:95%">
-        <el-form-item label="邮箱">
-          <el-input v-model="pojo.email" :placeholder="email"></el-input>
-        </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="pojo.password"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="infoSave()">保 存</el-button>
-        <el-button @click="dialogVisible = false">关 闭</el-button>
-      </span>
-    </el-dialog>
 
 
   </el-menu>
@@ -48,13 +27,11 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import {updateInfo} from '@/api/login'
 
 export default {
   data(){
     return {
       list:[],
-      dialogVisible: false, //编辑窗口是否可见
       pojo:{},//编辑实体
     }
   },
@@ -82,22 +59,6 @@ export default {
         location.reload() // 为了重新实例化vue-router对象 避免bug
       })
     },
-    infoSave(){
-      this.pojo.password = this.mdpassword
-      updateInfo(this.pojo).then(response =>{
-        this.$message({
-          message: response.message,
-          type: (response.flag ? 'success':'error')
-        });
-        if(response.flag){//如果成功
-          this.$store.dispatch('GetInfo').then(() => {
-            location.reload()//刷新页面
-          })
-        }
-      })      
-      
-      this.dialogVisible = false // 关闭窗口
-    }
 
   }
 }
