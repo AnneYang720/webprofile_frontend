@@ -20,14 +20,6 @@ Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
 
-// 部署时，通过dockfile赋值
-// const {apiBaseUrl} = document.querySelector('html').dataset // dockfile最后一行，通过变量名对应
-// if (apiBaseUrl) {
-//   Vue.prototype.$apiBaseUrl = `${apiBaseUrl}`
-// } else {
-//   Vue.prototype.$apiBaseUrl = process.env.BASE_API
-// }
-
 new Vue({
   el: '#app',
   router,

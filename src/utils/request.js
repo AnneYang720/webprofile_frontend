@@ -5,8 +5,7 @@ import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
-  // baseURL: this.$apiBaseUrl, // 部署时获取vue记录的值
-  baseURL: process.env.BASE_API, // api的base_url
+  baseURL: 'api', // 部署时获取vue记录的值
   timeout: 15000 // 请求超时时间
 })
 
