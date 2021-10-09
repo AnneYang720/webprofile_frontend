@@ -13,7 +13,6 @@ package-lock.json
 *.ntvs*
 *.njsproj
 *.sln
-static/netron/
 static/*.tfevents*
 static/*.json
 static/*.dot
